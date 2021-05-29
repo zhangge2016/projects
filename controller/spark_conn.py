@@ -82,5 +82,6 @@ new_df.repartition(3).write.format('csv').mode('overwrite').option('sep', '|').o
 # 写入json
 new_df.repartition(3).write.format('json').mode('overwrite').save('result.json')
 '''
+
 # 关闭spark会话
 spark.stop()
