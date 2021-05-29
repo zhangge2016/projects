@@ -4,6 +4,7 @@ import pandas as pd
 # 导入postgrep数据库访问模块
 import psycopg2
 
+
 class PostgresConn(object):
     def __init__(self, db_conn_config, log_info_file, log_error_file):
         self.db_conn_config = db_conn_config
