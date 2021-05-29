@@ -4,3 +4,4 @@ WORKDIR /usr/src/app
 COPY . /usr/src/app
 RUN pip install --default-timeout=1000 -r /usr/src/app/requirements.txt
 CMD [ "python", "./main.py"]
+
