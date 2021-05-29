@@ -14,7 +14,6 @@ def multi_threads(parameters, thread_num=10):
         t = MyThread(parameters)
         thread_list.append(t)
         t.start()
-
     # 在这里统一执行线程等待的方法
     for t in thread_list:
         t.join()
