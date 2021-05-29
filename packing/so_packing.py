@@ -2,6 +2,7 @@ import os
 import re
 import shutil
 import argparse
+
 try:
     from setuptools import setup, Extension
 except ImportError:
