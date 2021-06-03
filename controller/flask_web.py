@@ -1,17 +1,15 @@
-from flask import Flask, request
-from flask import render_template
+from flask import Flask, request, Blueprint, render_template
+import json
 
-app = Flask(__name__)
-
+blueprint = Blueprint('realtime_service', __name__)
 
 # 载入模型，初始化，防止反复加载增加响应时间
 def load_model():
     pass
 
-
 # 路由,请求方式为post请求
-@app.route("/page", methods=["POST"])
-def demo():
+@blueprint.route("/indexes_set", methods=["GET", "POST"])
+def indexes_set():
     # 获取http传来数据
     if request.method == "POST":
         '''
@@ -25,11 +23,14 @@ def demo():
         request.files # 获取上传的文件
         request.json # 若在请求中注明"application/json"则返回json解析数据,否则返回None
         '''
-        inputs = ''
-        # 算法主函数
-        results = run(inputs)
+        inputs = request.data
+
+        return_json = {
+            'code': 100000000,
+            'msg': 'success'
+        }
         # 返回
-        return results
+        return json.dumps(return_json, ensure_ascii=False)
         #return render_template("index.html", title='chat', user=results)
 
 
