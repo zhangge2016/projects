@@ -9,6 +9,13 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="35">
+        <serverdata>
+          <mappings>
+            <mapping deploy="gzhang" local="$PROJECT_DIR$/../35" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="37">
         <serverdata>
           <mappings>

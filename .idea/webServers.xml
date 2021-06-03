@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="67551f01-e047-4d32-b6bb-73423e5399ae" name="35" url="http://172.18.128.22">
+        <fileTransfer host="172.18.128.22" port="60048" privateKey="D:\PyCharm\id_rsa" rootFolder="/data" accessType="SFTP" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="60048" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
