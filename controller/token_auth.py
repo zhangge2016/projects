@@ -15,9 +15,9 @@ def verify_token(token):
         data = s.loads(token)
     except BadSignature:
         # AuthFailed 自定义的异常类型
-        raise AuthFailed(msg='token不正确')
+        raise BadSignature(msg='token不正确')
     except SignatureExpired:
-        raise AuthFailed(msg='token过期')
+        raise SignatureExpired(msg='token过期')
     # 校验通过返回True
     return True
 
