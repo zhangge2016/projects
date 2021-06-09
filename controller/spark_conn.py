@@ -70,12 +70,7 @@ new_df = spark.createDataFrame(new_rdd)
 
 # 把最终的结果写入到mysql, new_df是一个spark DataFrame的数据结构
 # ip是数据库访问ip, fpf_breeding是库名, result_tb是表名
-new_df.write.format('jdbc').options(url='jdbc:mysql://ip:3306/fpf_breeding?useUnicode=true&characterEncoding=utf8',
-                                    useSSL="false",
-                                    driver='com.mysql.jdbc.Driver',
-                                    dbtable='result_tb',
-                                    user='userName',
-                                    password='passwordId').mode('append').save()
+new_df.write.mode("append").jdbc(url=url, table="algorithm_center.ads_tag_manager_evaluate_algorithm_scores_tb", properties=prop)
 '''
 # 写入csv, 用repartition方法保存到3个子文件中
 new_df.repartition(3).write.format('csv').mode('overwrite').option('sep', '|').option('header', True).save('result.csv')

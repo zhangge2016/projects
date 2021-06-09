@@ -41,9 +41,10 @@ create table algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_
 	num_healthy_piglets_born_monthly decimal(8,3),
 	num_congenital_sick_weak_offspring_monthly decimal(8,3),
 	num_stillbirths_monthly decimal(8,3),
+	num_malformation_monthly decimal(8,3),
+	num_woping_monthly decimal(8,3),
 	num_heads_weak_offspring decimal(8,3),
 	weight_piglets_born_monthly decimal(8,3),
-	num_babies_born_monthly decimal(8,3),
 	num_dead_piglets_corresponding_batch decimal(8,3),
 	weight_weaned_piglets_monthly decimal(8,3),
 	num_weaned_piglets_monthly decimal(8,3),
@@ -56,14 +57,14 @@ create table algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_
 	proportion_design_capacity_on_hand decimal(8,3),
 	staffing_1000_sows decimal(8,3),
 	num_sows_on_hand_above_90kg_monthly decimal(8,3),
-	allocation_product_person_1000_sows decimal(8,3),
+	allocation_company_person_1000_sows decimal(8,3),
+	allocation_product_person_1000_sows numeric(8,3),
 	attendance decimal(8,3),
 	discharge_piggery_monthly decimal(8,3),
 	ave_monthly_feed_sows decimal(8,3),
-	emissions_sale_area decimal(8,3),
 	ave_monthly_feeding_quantity_sale decimal(8,3),
-	bradrakey_positions decimal(8,3),
-	num_talents_key_positions decimal(8,3),
+	bradrakey_positions numeric(8,3),
+	num_talents_key_positions numeric(8,3),
 	gestational_age_ratio decimal(8,3),
 	num_actual_monthly_mating_heads decimal(8,3),
 	monthly_theoretical_num_mating_heads decimal(8,3),
@@ -96,9 +97,10 @@ COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_i
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_healthy_piglets_born_monthly IS '当月产健仔猪头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_congenital_sick_weak_offspring_monthly IS '当月先天性病态弱仔头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_stillbirths_monthly IS '当月产死胎头数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_malformation_monthly IS '当月先天畸形头数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_woping_monthly IS '当月产木乃伊头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_heads_weak_offspring IS '0.5 kg以下弱仔头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.weight_piglets_born_monthly IS '当月出生活仔猪总重';
-COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_babies_born_monthly IS '当月出生活仔总数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_dead_piglets_corresponding_batch IS '对应批次死淘仔猪数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.weight_weaned_piglets_monthly IS '当月断奶仔猪总重';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_weaned_piglets_monthly IS '当月断奶仔猪总数';
@@ -111,11 +113,11 @@ COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_i
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.proportion_design_capacity_on_hand IS '设计产能存栏的比例';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.staffing_1000_sows IS '千头母猪全场人员配置';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_sows_on_hand_above_90kg_monthly IS '当月生产母猪存栏+当月90kg以上后备母猪存栏头数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.allocation_company_person_1000_sows IS '千头母猪公司人员配置';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.allocation_product_person_1000_sows IS '千头母猪生产人员配置';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.attendance IS '全场人数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.discharge_piggery_monthly IS '猪场当月总排污量';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.ave_monthly_feed_sows IS '母猪月均饲养量';
-COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.emissions_sale_area IS '待售区总排污量';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.ave_monthly_feeding_quantity_sale IS '待售区生长猪月均饲养量';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.bradrakey_positions IS '关键岗位人才流失数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.num_talents_key_positions IS '关键岗位人才总数';
@@ -128,39 +130,103 @@ COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_i
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.cumulative_deviation_bags IS '累计偏差袋数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb.planned_bags_pig_essence IS '猪精计划袋数';
 
+CREATE INDEX index_sow_id ON algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb(person_id);
+
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN batch_breeding_reserve_pig_num set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN batch_imported_reserve_pig_num set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN seed_num set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN reserve_pig_sows_with_backfat_standard_num set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN reserve_pig_sows_num set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN weight_pig_with_backfat_standard_num set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN weight_pig_num set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN optimum_standard_num_backfat set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_sows_weaned_per_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_sows_with_positive_pregnancy_test set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN corresponding_num_sows set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN corresponding_num_sows_early_delivery set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_sows_bred_early_stage set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN piglets_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_births_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_live_piglets_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_healthy_piglets_born_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_congenital_sick_weak_offspring_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_stillbirths_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_malformation_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_woping_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_heads_weak_offspring set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN weight_piglets_born_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_dead_piglets_corresponding_batch set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN weight_weaned_piglets_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_weaned_piglets_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_estrous_and_weaned_with7d_weaning_batch_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_weaned_pigs_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN ave_num_sows_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN ave_monthly_sows_production set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_sows_died_per_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_sows_eliminated_per_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN proportion_design_capacity_on_hand set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN staffing_1000_sows set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_sows_on_hand_above_90kg_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN allocation_company_person_1000_sows set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN allocation_product_person_1000_sows set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN attendance set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN discharge_piggery_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN ave_monthly_feed_sows set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN ave_monthly_feeding_quantity_sale set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN bradrakey_positions set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_talents_key_positions set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN gestational_age_ratio set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN num_actual_monthly_mating_heads set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN monthly_theoretical_num_mating_heads set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN monthly_planned_num_breeding_heads set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN theoretical_num_weaned_piglets_per_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN monthly_planned_weaning_piglets set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN cumulative_deviation_bags set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_sow_farm_index_tb ALTER COLUMN planned_bags_pig_essence set default -1;
 
 create table algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb(
 	id serial  PRIMARY KEY,
 	person_id varchar(32) not NULL,
-	num_dead_growing_pigs_monthly  decimal(8,3),
-	ave_daily_feed_growing_pigs_monthly  decimal(8,3),
-	monthly_batch_sales  decimal(8,3),
-	num_seedlings_corresponding_batch  decimal(8,3),
-	num_defective_pigs_batch  decimal(8,3),
-	feed_consumption_monthly_slaughter_pigs  decimal(8,3),
-	weight_gaof_monthly_pigs  decimal(8,3),
-	monthly_ave_num_generation_pigs  decimal(8,3),
-	num_people_pig_raising_section_branch_company  decimal(8,3),
-	monthly_ave_num_self_raised_pigs  decimal(8,3),
-	num_people_self_feeding_section_pig_branch  decimal(8,3),
-	amount_pigs_sold_monthly  decimal(8,3),
-	daily_ave_num_company_maintenance_section_monthly  decimal(8,3),
-	amount_self_raised_pigs_sold_monthly  decimal(8,3),
-	daily_ave_num_company_self_support_section_monthly  decimal(8,3),
-	actual_num_seedlings_monthly  decimal(8,3),
-	num_pigs_weaned_sow_farm  decimal(8,3),
-	amount_barracks_development_monthly  decimal(8,3),
-	monthly_planned_development  decimal(8,3),
-	amount_shed_completed_monthly  decimal(8,3),
-	amount_completed_monthly_plan  decimal(8,3),
-	weight_superior_products_monthly  decimal(8,3),
-	num_top_quality_products_sold_monthly  decimal(8,3),
-	sales_amount_superior_products_monthly  decimal(8,3),
-	weight_defective_products_sold_monthly  decimal(8,3),
-	num_defective_products_sold_monthly  decimal(8,3),
-	sales_amount_defective_products_monthly  decimal(8,3),
-	num_weak_piglets_monthly  decimal(8,3),
-	num_signs_monthly  decimal(8,3)
+	num_dead_growing_pigs_monthly numeric(8,3),
+	ave_daily_feed_growing_pigs_monthly numeric(8,3),
+	monthly_batch_sales numeric(8,3),
+	num_seedlings_corresponding_batch numeric(8,3),
+	num_defective_pigs_batch numeric(8,3),
+	ave_weight_actual_slaughter numeric(8,3),
+	ave_weight_seedlings_corresponding_batch numeric(8,3),
+	feed_consumption_monthly_slaughter_pigs numeric(8,3),
+	weight_gaof_monthly_pigs numeric(8,3),
+	monthly_ave_num_generation_pigs numeric(8,3),
+	num_people_pig_raising_section_branch_company numeric(8,3),
+	monthly_ave_num_self_raised_pigs numeric(8,3),
+	num_people_self_feeding_section_pig_branch numeric(8,3),
+	amount_pigs_sold_monthly numeric(8,3),
+	daily_ave_num_company_maintenance_section_monthly numeric(8,3),
+	amount_self_raised_pigs_sold_monthly numeric(8,3),
+	daily_ave_num_company_self_support_section_monthly numeric(8,3),
+	num_dead_growing_pigs_monthly_of_weak_pigfarm numeric(8,3),
+	ave_daily_feed_growing_pigs_monthly_of_weak_pigfarm numeric(8,3),
+	monthly_batch_sales_of_weak_pigfarm numeric(8,3),
+	num_seedlings_corresponding_batch_of_weak_pigfarm numeric(8,3),
+	num_defective_pigs_batch_of_weak_pigfarm numeric(8,3),
+	ave_weight_actual_slaughter_of_weak_pigfarm numeric(8,3),
+	ave_weight_seedlings_corresponding_batch_of_weak_pigfarm numeric(8,3),
+	feed_consumption_monthly_slaughter_pigs_of_weak_pigfarm numeric(8,3),
+	weight_gaof_monthly_pigs_of_weak_pigfarm numeric(8,3),
+	actual_num_seedlings_monthly numeric(8,3),
+	num_pigs_weaned_sow_farm numeric(8,3),
+	amount_barracks_development_monthly numeric(8,3),
+	monthly_planned_development numeric(8,3),
+	amount_shed_completed_monthly numeric(8,3),
+	amount_completed_monthly_plan numeric(8,3),
+	weight_superior_products_monthly numeric(8,3),
+	num_top_quality_products_sold_monthly numeric(8,3),
+	sales_amount_superior_products_monthly numeric(8,3),
+	weight_defective_products_sold_monthly numeric(8,3),
+	num_defective_products_sold_monthly numeric(8,3),
+	sales_amount_defective_products_monthly numeric(8,3),
+	num_weak_piglets_monthly numeric(8,3),
+	num_signs_monthly numeric(8,3)
 );
 COMMENT ON TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb IS '管理人员评价算法输入-肉猪场指标表';
 
@@ -171,6 +237,8 @@ COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.monthly_batch_sales IS '月批次出栏头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.num_seedlings_corresponding_batch IS '对应批次进苗头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.num_defective_pigs_batch IS '批次生长猪残次头数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.ave_weight_actual_slaughter IS '实际出栏均重';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.ave_weight_seedlings_corresponding_batch IS '对应批次进苗均重';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.feed_consumption_monthly_slaughter_pigs IS '月出栏猪全程耗料量';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.weight_gaof_monthly_pigs IS '月出栏猪总增重';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.monthly_ave_num_generation_pigs IS '月平均代养肉猪总量';
@@ -181,6 +249,15 @@ COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.daily_ave_num_company_maintenance_section_monthly IS '公司代养版块当月日均人数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.amount_self_raised_pigs_sold_monthly IS '当月销售自养肉猪总量';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.daily_ave_num_company_self_support_section_monthly IS '公司自养版块当月日均人数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.num_dead_growing_pigs_monthly_of_weak_pigfarm IS '当月死淘生长猪数-弱小猪场';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.ave_daily_feed_growing_pigs_monthly_of_weak_pigfarm IS '生长猪当月日均饲养量-弱小猪场';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.monthly_batch_sales_of_weak_pigfarm IS '月批次出栏头数-弱小猪场';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.num_seedlings_corresponding_batch_of_weak_pigfarm IS '对应批次进苗头数-弱小猪场';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.num_defective_pigs_batch_of_weak_pigfarm IS '批次生长猪残次头数-弱小猪场';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.ave_weight_actual_slaughter_of_weak_pigfarm IS '实际出栏均重-弱小猪场';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.ave_weight_seedlings_corresponding_batch_of_weak_pigfarm IS '对应批次进苗均重-弱小猪场';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.feed_consumption_monthly_slaughter_pigs_of_weak_pigfarm IS '月出栏猪全程耗料量-弱小猪场';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.weight_gaof_monthly_pigs_of_weak_pigfarm IS '月出栏猪总增重-弱小猪场';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.actual_num_seedlings_monthly IS '当月实际进苗数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.num_pigs_weaned_sow_farm IS '母猪场月实际断奶肉猪总头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.amount_barracks_development_monthly IS '当月栏舍开发总量';
@@ -195,6 +272,49 @@ COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.sales_amount_defective_products_monthly IS '次品当月销售总金额';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.num_weak_piglets_monthly IS '当月进弱小猪头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb.num_signs_monthly IS '当月总进苗头数';
+
+CREATE INDEX index_pork_id ON algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb(person_id);
+
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_dead_growing_pigs_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN ave_daily_feed_growing_pigs_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN monthly_batch_sales set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_seedlings_corresponding_batch set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_defective_pigs_batch set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN ave_weight_actual_slaughter set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN ave_weight_seedlings_corresponding_batch set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN feed_consumption_monthly_slaughter_pigs set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN weight_gaof_monthly_pigs set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN monthly_ave_num_generation_pigs set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_people_pig_raising_section_branch_company set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN monthly_ave_num_self_raised_pigs set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_people_self_feeding_section_pig_branch set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN amount_pigs_sold_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN daily_ave_num_company_maintenance_section_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN amount_self_raised_pigs_sold_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN daily_ave_num_company_self_support_section_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_dead_growing_pigs_monthly_of_weak_pigfarm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN ave_daily_feed_growing_pigs_monthly_of_weak_pigfarm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN monthly_batch_sales_of_weak_pigfarm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_seedlings_corresponding_batch_of_weak_pigfarm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_defective_pigs_batch_of_weak_pigfarm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN ave_weight_actual_slaughter_of_weak_pigfarm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN ave_weight_seedlings_corresponding_batch_of_weak_pigfarm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN feed_consumption_monthly_slaughter_pigs_of_weak_pigfarm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN weight_gaof_monthly_pigs_of_weak_pigfarm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN actual_num_seedlings_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_pigs_weaned_sow_farm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN amount_barracks_development_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN monthly_planned_development set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN amount_shed_completed_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN amount_completed_monthly_plan set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN weight_superior_products_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_top_quality_products_sold_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN sales_amount_superior_products_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN weight_defective_products_sold_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_defective_products_sold_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN sales_amount_defective_products_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_weak_piglets_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_pork_farm_index_tb ALTER COLUMN num_signs_monthly set default -1;
 
 
 
@@ -211,6 +331,7 @@ create table algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_in
 	actual_num_seed_selected_introducer_export decimal(8,3),
 	num_7kg_weaned_sows_corresponding_batch_export decimal(8,3),
 	weight_gain decimal(8,3),
+	ave_feed_day decimal(8,3),
 	num_entries decimal(8,3),
 	weight_month decimal(8,3),
 	num_sales_monthly decimal(8,3),
@@ -232,6 +353,7 @@ COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_fa
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb.actual_num_seed_selected_introducer_export IS '引种方实际选种头数-外销';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb.num_7kg_weaned_sows_corresponding_batch_export IS '对应批次进7kg断奶小母猪头数-外销';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb.weight_gain IS '总增重';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb.ave_feed_day IS '平均饲养天数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb.num_entries IS '出栏头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb.weight_month IS '当月出栏总重量';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb.num_sales_monthly IS '当月出栏总头数';
@@ -240,33 +362,80 @@ COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_fa
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb.effective_area_enclosure IS '栏舍有效面积总和';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb.reserve_pigs_at_end_month IS '月末后备猪存栏';
 
+CREATE INDEX index_reserve_id ON algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb(person_id);
+
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  num_deaths_per_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  monthly_reserve_pig_production set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  num_deaths_batches set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  num_7kg_weaned_pigs_corresponding_batch set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  actual_num_seed_selection_introducer_retaining set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  num_7kg_weaned_sows_corresponding_batch_retaining set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  actual_num_seed_selected_introducer_export set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  num_7kg_weaned_sows_corresponding_batch_export set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  weight_gain set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  ave_feed_day set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  num_entries set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  weight_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  num_sales_monthly set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  num_reserve_pigs_with_estrus_record_corresponding_batch set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  num_reserve_pigs_aged_ge_160d_end_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  effective_area_enclosure set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_reserve_farm_index_tb ALTER COLUMN  reserve_pigs_at_end_month set default -1;
 
 
 
 create table algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb(
 	id serial  PRIMARY KEY,
 	person_id varchar(32) not NULL,
-	monthly_bags decimal(8,3),
-	num_effective_dilutions_per_month decimal(8,3),
-	sperm_count decimal(8,3),
-	semen_volume decimal(8,3),
-	num_sperm_linear_motion decimal(8,3),
-	abnormal_sperm_count decimal(8,3),
-	num_qualified_samples_finished_product_delivery_pig_sperm decimal(8,3),
-	sample_quantity_finished_product_delivery_pig_sperm_test decimal(8,3),
-	production_costs decimal(8,3),
-	monthly_production decimal(8,3),
-	drug_cost decimal(8,3),
-	ave_monthly_boar_production decimal(8,3),
-	material_cost decimal(8,3),
-	monthly_ave_num_boars_stock decimal(8,3),
-	actual_num_introduced_plants_per_month decimal(8,3),
-	monthly_planned_num_introduced_plants decimal(8,3)
+	elimination_num_of_reserve_boars numeric(8,3),
+	ave_monthly_reserve_boar_production numeric(8,3),
+	num_of_dead_reserve_boars numeric(8,3),
+	num_of_dead_production_boars numeric(8,3),
+	ave_monthly_production_of_boars numeric(8,3),
+	elimination_num_of_production_boars numeric(8,3),
+	effective_num_of_boars numeric(8,3),
+	available_times numeric(8,3),
+	monthly_total_semen_collection_times numeric(8,3),
+	total_semen_collection_times numeric(8,3),
+	ave_num_of_productive_boars_per_month numeric(8,3),
+	total_monthly_pig_sperm_production_capacity numeric(8,3),
+	ave_monthly_of_boars numeric(8,3),
+	on_the_job_num_in_the_station numeric(8,3),
+	monthly_bags numeric(8,3),
+	num_effective_dilutions_per_month numeric(8,3),
+	sperm_count numeric(8,3),
+	semen_volume numeric(8,3),
+	num_sperm_linear_motion numeric(8,3),
+	abnormal_sperm_count numeric(8,3),
+	num_qualified_samples_finished_product_delivery_pig_sperm numeric(8,3),
+	sample_quantity_finished_product_delivery_pig_sperm_test numeric(8,3),
+	production_costs numeric(8,3),
+	monthly_production numeric(8,3),
+	drug_cost numeric(8,3),
+	ave_monthly_boar_production numeric(8,3),
+	material_cost numeric(8,3),
+	monthly_ave_num_boars_stock numeric(8,3),
+	actual_num_introduced_plants_per_month numeric(8,3),
+	monthly_planned_num_introduced_plants numeric(8,3)
 );
 COMMENT ON TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb IS '管理人员评价算法输入-公猪场指标表';
 
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.id IS '自增ID';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.person_id IS '人员id；默认''';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.elimination_num_of_reserve_boars IS '后备公猪淘汰头数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.ave_monthly_reserve_boar_production IS '月均后备公猪饲养量';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.num_of_dead_reserve_boars IS '后备公猪死亡头数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.num_of_dead_production_boars IS '生产公猪死亡头数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.ave_monthly_production_of_boars IS '月均生产公猪饲养量';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.elimination_num_of_production_boars IS '生产公猪淘汰头数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.effective_num_of_boars IS '有效公猪数量';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.available_times IS '可用次数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.monthly_total_semen_collection_times IS '月总采精次数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.total_semen_collection_times IS '总采精次数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.ave_num_of_productive_boars_per_month IS '月均生产公猪存栏数';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.total_monthly_pig_sperm_production_capacity IS '月猪精产能总量';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.ave_monthly_of_boars IS '月均公猪饲养量';
+COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.on_the_job_num_in_the_station IS '站内在职人数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.monthly_bags IS '月出库总袋数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.num_effective_dilutions_per_month IS '月有效采精稀释次数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.sperm_count IS '总精子数';
@@ -283,3 +452,36 @@ COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.monthly_ave_num_boars_stock IS '月均公猪存栏头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.actual_num_introduced_plants_per_month IS '月实际引种头数';
 COMMENT ON COLUMN algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb.monthly_planned_num_introduced_plants IS '月计划引种头数';
+
+CREATE INDEX index_boar_id ON algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb(person_id);
+
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN elimination_num_of_reserve_boars set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN ave_monthly_reserve_boar_production set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN num_of_dead_reserve_boars set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN num_of_dead_production_boars set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN ave_monthly_production_of_boars set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN elimination_num_of_production_boars set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN effective_num_of_boars set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN available_times set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN monthly_total_semen_collection_times set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN total_semen_collection_times set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN ave_num_of_productive_boars_per_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN total_monthly_pig_sperm_production_capacity set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN ave_monthly_of_boars set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN on_the_job_num_in_the_station set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN monthly_bags set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN num_effective_dilutions_per_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN sperm_count set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN semen_volume set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN num_sperm_linear_motion set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN abnormal_sperm_count set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN num_qualified_samples_finished_product_delivery_pig_sperm set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN sample_quantity_finished_product_delivery_pig_sperm_test set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN production_costs set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN monthly_production set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN drug_cost set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN ave_monthly_boar_production set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN material_cost set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN monthly_ave_num_boars_stock set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN actual_num_introduced_plants_per_month set default -1;
+ALTER TABLE algorithm_center.ads_tag_manager_evaluate_algorithm_boar_farm_index_tb ALTER COLUMN monthly_planned_num_introduced_plants set default -1;
